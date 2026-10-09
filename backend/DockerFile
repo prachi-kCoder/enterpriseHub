@@ -10,7 +10,8 @@ FROM eclipse-temurin:17-jre
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+# Using a safer copy approach to avoid multi-file collision errors
+COPY --from=build /app/target/*.jar ./app.jar
 
 EXPOSE 8080
 
