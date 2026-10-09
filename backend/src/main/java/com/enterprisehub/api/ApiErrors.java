@@ -1,0 +1,11 @@
+package com.enterprisehub.api;
+import jakarta.persistence.EntityNotFoundException; import java.util.Map; import org.springframework.dao.OptimisticLockingFailureException; import org.springframework.dao.DataIntegrityViolationException; import jakarta.validation.ConstraintViolationException; import org.springframework.http.*; import org.springframework.security.access.AccessDeniedException; import org.springframework.web.bind.MethodArgumentNotValidException; import org.springframework.web.bind.annotation.*; import org.springframework.http.converter.HttpMessageNotReadableException;
+@RestControllerAdvice public class ApiErrors {
+ private Map<String,Object> body(String code,String message){return Map.of("error",message,"code",code);}
+ @ExceptionHandler(EntityNotFoundException.class) ResponseEntity<?> missing(RuntimeException e){return ResponseEntity.status(404).body(body("NOT_FOUND",e.getMessage()));}
+ @ExceptionHandler({IllegalArgumentException.class,MethodArgumentNotValidException.class,HttpMessageNotReadableException.class,ConstraintViolationException.class}) ResponseEntity<?> invalid(Exception e){String message=e instanceof IllegalArgumentException&&e.getMessage()!=null?e.getMessage():"Please check the submitted fields";return ResponseEntity.badRequest().body(body("VALIDATION_ERROR",message));}
+ @ExceptionHandler(AccessDeniedException.class) ResponseEntity<?> denied(AccessDeniedException e){return ResponseEntity.status(403).body(body("FORBIDDEN",e.getMessage()==null?"You do not have permission to perform this action":e.getMessage()));}
+ @ExceptionHandler(DataIntegrityViolationException.class) ResponseEntity<?> duplicate(DataIntegrityViolationException e){return ResponseEntity.status(409).body(body("CONSTRAINT_CONFLICT","A conflicting record already exists. Refresh and retry."));}
+ @ExceptionHandler(OptimisticLockingFailureException.class) ResponseEntity<?> conflict(OptimisticLockingFailureException e){return ResponseEntity.status(409).body(body("VERSION_CONFLICT","This request was updated by someone else. Refresh it and try again."));}
+ @ExceptionHandler(Exception.class) ResponseEntity<?> unexpected(Exception e){return ResponseEntity.status(500).body(body("INTERNAL_ERROR","The request could not be completed. Please try again."));}
+}

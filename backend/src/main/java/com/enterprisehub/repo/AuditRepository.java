@@ -1,0 +1,1 @@
+package com.enterprisehub.repo; import com.enterprisehub.domain.AuditLog; import java.util.List; import org.springframework.data.jpa.repository.JpaRepository; public interface AuditRepository extends JpaRepository<AuditLog,Long>{ List<AuditLog> findByRequestIdOrderByCreatedAtDesc(Long requestId); }

@@ -1,0 +1,35 @@
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Java
+backend/target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*
+
+# H2 Database
+*.mv.db
+*.trace.db
+data/
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Temporary
+tmp/
+temp/

@@ -1,0 +1,14 @@
+package com.enterprisehub.api;
+import com.enterprisehub.service.RequestService; import jakarta.validation.Valid; import jakarta.validation.constraints.*; import java.security.Principal; import java.util.Map; import org.springframework.data.domain.Page; import org.springframework.security.access.prepost.PreAuthorize; import org.springframework.web.bind.annotation.*;
+@RestController @org.springframework.validation.annotation.Validated @RequestMapping("/api/requests") public class RequestController {
+ private final RequestService service; public RequestController(RequestService s){service=s;}
+ @GetMapping public Page<?> list(@RequestParam(required=false)@Size(max=120)String q,@RequestParam(required=false)@Pattern(regexp="(?i)PENDING_APPROVAL|OPEN|IN_PROGRESS|RESOLVED|REJECTED")String status,@RequestParam(required=false)@Pattern(regexp="P1|P2|P3|P4")String priority,@RequestParam(defaultValue="0")@Min(0)int page,@RequestParam(defaultValue="10")@Min(1)@Max(100)int size,Principal p){return service.list(q,status,priority,page,size,p.getName());}
+ @GetMapping("/{id}") public Object get(@PathVariable @Positive Long id,Principal p){return service.getAccessible(id,p.getName());}
+ public record NewRequest(@NotBlank @Size(max=180)String title,@NotBlank @Size(max=10000)String description,@NotBlank @Size(max=40)String category,@NotBlank @Pattern(regexp="(?i)LOW|MEDIUM|HIGH|CRITICAL")String impact,@NotBlank @Pattern(regexp="(?i)LOW|MEDIUM|HIGH|CRITICAL")String urgency,@NotNull @Positive Long departmentId){}
+ @PostMapping public Object create(@Valid @RequestBody NewRequest x,Principal p,@RequestHeader(value="Idempotency-Key",required=false)String key){return service.create(Map.of("title",x.title().trim(),"description",x.description().trim(),"category",x.category().trim(),"impact",x.impact(),"urgency",x.urgency(),"departmentId",x.departmentId()),p.getName(),key);}
+ public record Action(@Email String assigneeEmail,@Size(max=1000)String reason){}
+ @PostMapping("/{id}/{action}") public Object action(@PathVariable @Positive Long id,@PathVariable @Pattern(regexp="approve|reject|assign|resolve")String action,@Valid @RequestBody(required=false)Action body,Principal p){return service.action(id,action,body==null?null:body.assigneeEmail(),p.getName(),body==null?null:body.reason());}
+ public record PriorityOverride(@NotBlank @Pattern(regexp="(?i)LOW|MEDIUM|HIGH|CRITICAL")String impact,@NotBlank @Pattern(regexp="(?i)LOW|MEDIUM|HIGH|CRITICAL")String urgency,@NotBlank @Size(max=1000)String reason){}
+ @PostMapping("/{id}/priority") @PreAuthorize("hasAnyRole('ADMIN','MANAGER')") public Object override(@PathVariable @Positive Long id,@Valid @RequestBody PriorityOverride x,Principal p){return service.overridePriority(id,x.impact(),x.urgency(),x.reason(),p.getName());}
+ @GetMapping("/{id}/audit") public Object audit(@PathVariable @Positive Long id,Principal p){return service.auditAccessible(id,p.getName());}
+}

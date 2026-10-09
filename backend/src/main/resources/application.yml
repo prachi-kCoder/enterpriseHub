@@ -1,0 +1,19 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/enterprisehub?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: enterprisehub
+    password: enterprisehub
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+app:
+  jwt-secret: ${JWT_SECRET:enterprisehub-demo-secret-key-change-this-2026-keep-it-long}
+  jwt-expiration-ms: 86400000

@@ -1,0 +1,6 @@
+package com.enterprisehub.service;
+import com.enterprisehub.domain.ServiceRequest; import com.enterprisehub.repo.SlaBreachAlertRepository; import com.enterprisehub.repo.ServiceRequestRepository; import java.time.Instant; import java.util.List; import org.junit.jupiter.api.Test; import static org.mockito.Mockito.*;
+class SlaBreachMonitorTest {
+ @Test void doesNotCreateDuplicateBreachAlert(){var request=new ServiceRequest();request.id=42L;var requests=mock(ServiceRequestRepository.class);when(requests.findByResolvedAtIsNullAndSlaDueAtBeforeAndStatusNotIn(any(),anyList())).thenReturn(List.of(request));var alerts=mock(SlaBreachAlertRepository.class);when(alerts.existsByRequestId(42L)).thenReturn(true);new SlaBreachMonitor(requests,alerts).recordNewBreaches();verify(alerts,never()).saveAndFlush(any());}
+ @Test void createsAlertOnceForNewlyBreachedRequest(){var request=new ServiceRequest();request.id=43L;var requests=mock(ServiceRequestRepository.class);when(requests.findByResolvedAtIsNullAndSlaDueAtBeforeAndStatusNotIn(any(),anyList())).thenReturn(List.of(request));var alerts=mock(SlaBreachAlertRepository.class);when(alerts.existsByRequestId(43L)).thenReturn(false);new SlaBreachMonitor(requests,alerts).recordNewBreaches();verify(alerts).saveAndFlush(argThat(a->a.requestId.equals(43L)));}
+}
