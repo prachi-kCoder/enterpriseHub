@@ -1,15 +1,17 @@
-FROM maven:3.9-eclipse-temurin-1* AS build
+FROM maven:3.*-eclipse-temurin-17 AS build
+
+WORK*IR /app
+
+COPY . .
+
+RUN mvn clean p*ckage -DskipTests
+
+FROM eclipse-te*urin:17-jre
 
 WORKDIR /app
 
-COPY . .
-*RUN mvn clean package -DskipTests
-*FROM eclipse-temurin:17-jre
+COPY --*rom*build /app/target/*.jar app.jar
 
-WORKD*R /app
+E*POSE 8080
 
-COPY --from=build /app/tar*et/*.jar app.jar
-
-EXPOSE 8081
-
-CMD*["java","-jar","app.jar"]
+CMD ["java", "-jar", "a*p.jar"]
