@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState}from'react';
 import{Activity,AlertTriangle,ArrowUpRight,Bell,Check,ChevronDown,ChevronRight,Clock3,Command,Download,Inbox,Plus,Search,ShieldCheck,SlidersHorizontal,X}from'lucide-react';
 
-const API='http://localhost:8080/api';
+const API = import.meta.env.VITE_API_URL;
 const seed=[
  {id:2048,title:'Laptop replacement request',description:'Current device is approaching end of life and battery health is below 60%.',category:'IT & Equipment',priority:'P1',priorityReason:'P1 assigned from critical impact and high urgency',impact:'CRITICAL',urgency:'HIGH',status:'PENDING_APPROVAL',requester:{name:'Taylor Smith'},assignee:null,slaDueAt:new Date(Date.now()+1000*60*24).toISOString(),createdAt:new Date(Date.now()-1000*60*216).toISOString()},
  {id:2047,title:'Access to analytics workspace',description:'Need read access to the quarterly service performance workspace.',category:'Access',priority:'P2',priorityReason:'P2 assigned from high impact and medium urgency',impact:'HIGH',urgency:'MEDIUM',status:'OPEN',requester:{name:'Taylor Smith'},assignee:{name:'Priya Sharma'},slaDueAt:new Date(Date.now()+1000*60*90).toISOString(),createdAt:new Date(Date.now()-1000*60*390).toISOString()},
